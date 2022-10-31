@@ -1,27 +1,44 @@
-import { useEffect, useState } from "react";
+import {useEffect, useState} from "react";
 import AppRouter from "components/Router";
-import {authService, auth} from "fbase";
+import {authService} from "fbase";
+import "style.css";
 
 function App() {
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [init, setInit] = useState(false);
+    const [userObj , setUserObj] = useState(null);
 
-  useEffect(() => {
-    const user = auth.currentUser;
-    console.log(user)
-    setIsLoggedIn(user !== null); 
-  
-  }, [])
+    useEffect(() => {
+        authService.onAuthStateChanged(user => {
+            if (user) {
+                setUserObj({
+                    displayName : user.displayName,
+                    uid : user.uid,
+                    updateProfile : (args) => user.updateProfile(args),
+                });
+            } else {
+                setUserObj(null);
+            }
+            setInit(true);
+        });
+    }, []);
 
-  const login = () => setIsLoggedIn(true);
+    const refreshUser = () => {
+        const user = authService.currentUser;
+        setUserObj({
+            displayName : user.displayName,
+            uid : user.uid,
+            updateProfile : (args) => user.updateProfile(args),
+        });
+    }
 
-  return (
-    <>
-      <AppRouter isLoggedIn={isLoggedIn} login={login}/>
-      <footer>
-        &copy; Nwitter {new Date().getFullYear()}
-      </footer>
-    </>
-  )
+    return (
+        <>
+            {init ? <AppRouter refreshUser={refreshUser} isLoggedIn={Boolean(userObj)} user={userObj}/> : "Initializing..."}
+            {/*<footer>*/}
+            {/*    &copy; Nwitter {new Date().getFullYear()}*/}
+            {/*</footer>*/}
+        </>
+    );
 }
 
 export default App;

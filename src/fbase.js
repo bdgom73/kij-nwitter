@@ -1,7 +1,8 @@
 import firebase from 'firebase/compat/app';
 import 'firebase/compat/auth';
-import { getAuth } from "firebase/auth";
-import 'firebase/compat/firestore';
+import "firebase/compat/firestore";
+import * as firestore from "firebase/firestore";
+import * as storage from "firebase/storage";
 
 const firebaseConfig = {
     apiKey: process.env.REACT_APP_FCM_API_KEY,
@@ -13,22 +14,15 @@ const firebaseConfig = {
     measurementId: process.env.REACT_APP_MEASUREMENT_ID
 };
 
-// const firebaseConfig = {
-//     apiKey: "AIzaSyDsazwB3IEN54Sl9UMTUUbaJhQz9rIZvuk",
-//     authDomain: "kij-nwitter.firebaseapp.com",
-//     projectId: "kij-nwitter",
-//     storageBucket: "kij-nwitter.appspot.com",
-//     messagingSenderId: "950407789804",
-//     appId: "1:950407789804:web:57a749b3cd5cf83d58f9c9",
-//     measurementId: "G-61ETK54RT7"
-//   };
-
-firebase.initializeApp(firebaseConfig);
+const app = firebase.initializeApp(firebaseConfig);
 
 export const fireBaseInstance = firebase;
 
 export const authService = firebase.auth();
 
-export const auth = getAuth();
-
-// const analytics = getAnalytics(app);
+export const db = firestore.getFirestore(app);
+export const dbService = firestore;
+export const storageService = {
+    ...storage,
+    getStorage : storage.getStorage(app)
+}
